@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.LinkedList;
 
 // Enumeration to store message types
-enum MessageType{REQUEST, RELEASE, ENTER, EXIT};
+enum MessageType{REQUEST, RELEASE};
 
 // Object to store message passing between nodes
 // Message class can be modified to incorporate all fields that need to be passed
@@ -34,15 +34,6 @@ public class Message implements Serializable
 		this.destNodeID = destNodeID;
 	}
 
-	// Constructor
-	public Message(MessageType msgType, String message, int sourceNodeID, int destNodeID)
-	{
-		this.msgType = msgType;
-		this.message = message;
-		this.sourceNodeID = sourceNodeID;
-		this.destNodeID = destNodeID;
-	}
-
 	public Message(MessageType msgType, int sourceNodeID, int destNodeID, int timeStamp)
 	{
 		this.msgType = msgType;
@@ -58,16 +49,6 @@ public class Message implements Serializable
 		{
 			this.message = "REQUEST";
 		}
-	}
-
-	// Constructor
-	public Message(MessageType msgType, String message, int sourceNodeID, int destNodeID, int timeStamp)
-	{
-		this.msgType = msgType;
-		this.message = message;
-		this.sourceNodeID = sourceNodeID;
-		this.destNodeID = destNodeID;
-		this.timeStamp = timeStamp;
 	}
 
 	// Convert current instance of Message to ByteBuffer in order to send message over SCTP

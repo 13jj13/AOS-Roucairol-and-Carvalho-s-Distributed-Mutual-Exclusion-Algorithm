@@ -18,9 +18,8 @@ public class RCMutualExclusionService {
     private boolean inCriticalSection = false;
     private boolean waitingForCriticalSection = false;
 
-    public Map<Integer, Boolean> keys;
-    public Map<Integer, Integer> timeStamps;
-    public Map<Integer, Boolean> pendingRequests;
+    public Map<Integer, Boolean> keys = new ConcurrentHashMap<>();
+    public Map<Integer, Boolean> pendingRequests = new ConcurrentHashMap<>();
     public Map<Integer, NeighborConnectionHandler> neighborConnections = new ConcurrentHashMap<>();
 
     private final Semaphore semaphore = new Semaphore(1);
@@ -28,9 +27,9 @@ public class RCMutualExclusionService {
 
     public RCMutualExclusionService(Node node) throws Exception {
         this.node = node;
-        this.keys = node.keys;
-        this.timeStamps = node.timeStamps;
-        this.pendingRequests = node.pendingRequests;
+
+        // Initialize the keys and pending requests.
+        initializeHashMaps();
 
         // Create server - pass the node/process for this program instance.
         SCTPServer server = new SCTPServer(node);
@@ -59,6 +58,46 @@ public class RCMutualExclusionService {
         // Start server of this node. This handles the rest of the neighbor connections for this node.
         Thread serverThread = new Thread(server);
         serverThread.start();
+    }
+
+    /*
+        Method: initializeHashMaps
+        Description: Sets and initializes the keys and pending requests of the neighbors of this node.
+        Parameters: None
+        Returns: Nothing
+     */
+    public void initializeHashMaps()
+    {
+        // Make sure that neighbors list has been added.
+        if(node.getNeighbors() == null)
+        {
+            return;
+        }
+
+        // Otherwise, set keys, timestamp, and pending requests for neighbors of node.
+        else
+        {
+            // Iterate through each neighbor of the node.
+            for(NeighborNode neighbor: node.getNeighbors())
+            {
+
+                // Mark that no neighbors have a pending request.
+                pendingRequests.put(neighbor.nodeID, false);
+
+                // If neighbor's nodeID is larger than this node ID
+                if(neighbor.nodeID > node.nodeID)
+                {
+                    // Set that this node holds the key for this neighbor.
+                    keys.put(neighbor.nodeID, true);
+                }
+                else
+                {
+                    // Else, this node does not hold the key for this neighbor (the neighbor holds the key).
+                    keys.put(neighbor.nodeID, false);
+                }
+
+            }
+        }
     }
 
     /*
@@ -306,8 +345,6 @@ public class RCMutualExclusionService {
 
             // Add this key to the list of keys.
             keys.put(msg.sourceNodeID, true);
-            // Reset timestamp value for this neighbor.
-            timeStamps.put(msg.sourceNodeID, Integer.MAX_VALUE);
             semaphore.release();
         }
 

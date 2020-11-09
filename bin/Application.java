@@ -49,9 +49,6 @@ public class Application
 
             System.out.println("Node: " + nodeID + " on machine " + node.hostName + " on port " + node.listeningPort);
 
-            // Set up neighbors' pending requests, keys, and timestamps.
-            node.setUpNeighborMaps();
-
             // Set up Roucairol and Carvalho's distributed mutual exclusion service.
             RCMutualExclusionService rc = new RCMutualExclusionService(node);
 
