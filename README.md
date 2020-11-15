@@ -3,17 +3,18 @@
 # 1 Project Description
 
 Implement a mutual exclusion service among n processes using Roucairol and Carvalho’s distributed
-mutual exclusion algorithm. Your service should provide two function calls to the application: csenter() and cs-leave(). The first function call cs-enter() allows an application to request permission
+mutual exclusion algorithm. Your service should provide two function calls to the application: 
+csenter() and cs-leave(). The first function call cs-enter() allows an application to request permission
 to start executing its critical section. The function call is blocking and returns only when the
 invoking application can execute its critical section. The second function call cs-leave() allows an
 application to inform the service that it has finished executing its critical section.
 
-Implementation Details: Design your program so that each process or node consists of two
+**Implementation Details:** Design your program so that each process or node consists of two
 separate modules. The top module implements the application (requests and executes critical
 sections). The bottom module implements the mutual exclusion service. The two modules interact
 using cs-enter() and cs-leave() functions.
 
-Application: The application is responsible for generating critical section requests and then
+**Application:** The application is responsible for generating critical section requests and then
 executing critical sections on receiving permission from the mutual exclusion service. Model your
 application using the following two parameters: inter-request delay, denoted by d, and cs-execution
 time, denoted by c. The first parameter denotes the time elapsed between when a node’s current
@@ -21,12 +22,16 @@ request is satisfied and when it generates the next request. The second paramete
 a node spends in its critical section. Assume that both inter-request delay and cs-execution time are
 random variables with exponential probability distribution.
 
-Testing: Design a mechanism to test the correctness of your implementation. Your testing mechanism should ascertain that at most one process is in its critical section at any time. It should
+**Testing:** Design a mechanism to test the correctness of your implementation. Your testing 
+mechanism should ascertain that at most one process is in its critical section at any time. It should
 be as automated as possible and should require minimal human intervention. For example, visual
 inspection of log files to verify the correctness of the execution will not be acceptable. You will be
 graded on how accurate and automated your testing mechanism is.
 
-Experimental Evaluation: Evaluate the performance of your implementation with respect to
+Our plans:
+The program will log the timestamps and process ID of each process that executes its critical section and the test will use these logs to check if there is any other process that also executed its critical section at the same time. This is done by checking if any process’s init-term timestamp pairs overlap with any other process’s init-term timestamp pairs.
+
+**Experimental Evaluation:** Evaluate the performance of your implementation with respect to
 message complexity, response time and system throughput using experiments for various values
 of system parameters, namely n, d and c. Display the results of your experiments by plotting
 appropriate graphs. Note that each point in the graph should be obtained by averaging over
