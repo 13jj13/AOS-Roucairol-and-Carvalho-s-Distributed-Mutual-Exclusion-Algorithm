@@ -17,6 +17,8 @@
     Inter-request delay is the time elapsed between when a node's current request is satisfied and when it generates
     the next request. CS-execution time denotes the time a node spends in its critical section.
  */
+import java.io.*;
+import java.time.LocalTime; // Import the LocalTime class
 
 public class Application
 {
@@ -65,6 +67,17 @@ public class Application
             System.out.println("Mean CS-Execution Time: " + configInfo.getCsExecutionTime());
             System.out.println("Number of requests per node: " + configInfo.getNumRequestsPerNode());
 
+            LocalTime initTime;
+            LocalTime termTime;
+            File file = new File("/home/010/e/el/elw160030/AOS/project2/test/log.txt");
+            // create the file if the file is not already present
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            //append the content to file
+            FileWriter fw = new FileWriter(file,true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
             // Iterate through each message request for the node.
             for(int reqNum = 1; reqNum <= configInfo.getNumRequestsPerNode(); reqNum++)
             {
@@ -75,6 +88,7 @@ public class Application
                 // Once it returns, then process can enter its critical section.
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
+                initTime = LocalTime.now();
 
                 // Critical section -  CS Execution Time
                 // This is the time the node spends in its critical section.
@@ -82,7 +96,19 @@ public class Application
 
                 // Exit critical section
                 System.out.println("Node " + nodeID + " exiting its critical section.");
-
+                termTime = LocalTime.now();
+               
+                // Write to file - writes to a file in local machine
+                bw.write("Request #" + reqNum + "; ");
+                bw.newLine();
+                bw.write("Process ID: " + node.nodeID
+                            + "; init(x): " + initTime
+                            + "; term(x): " + termTime);
+                bw.newLine();
+                System.out.println("Process ID: " + node.nodeID
+                                   + "; init(x): " + initTime
+                                   + "; term(x): " + termTime);
+                
                 // Inform mutual exclusion service that process has finished executing its critical section.
                 rc.csLeave();
 
@@ -91,8 +117,9 @@ public class Application
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
             }
 
+            bw.close();
+            
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
-
 
         }
 
