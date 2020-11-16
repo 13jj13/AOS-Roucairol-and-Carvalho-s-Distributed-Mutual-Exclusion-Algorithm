@@ -6,7 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 
 class Test {
-    // function to check if there's any process' critical sections overlap
+    /*
+        Method: checkOverlap
+        Description: Function to check if there's any process' critical sections overlap and returns boolean of if it does overlap or not
+        Parameters: 2D Arraylist Matrix
+        Returns: boolean true if cs overlaps, false if cs does not 
+    */
     static boolean checkOverlap(ArrayList<ArrayList<String>> dataMatrix) {
         boolean check = false;
         for(int row = 0; row < dataMatrix.size(); row++) {
