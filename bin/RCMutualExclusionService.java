@@ -14,6 +14,7 @@ public class RCMutualExclusionService {
 
     public int timeStamp = 0;
     private int reqTimeStamp = 0;
+    public int msgCounter = 0;
 
     private boolean inCriticalSection = false;
     private boolean waitingForCriticalSection = false;
@@ -224,7 +225,15 @@ public class RCMutualExclusionService {
 
     }
 
-
+    /*
+        Method: getMsgCount
+        Description: return the number of messages sent
+        Parameters: None
+        Returns: int - number of messages
+     */
+    public int getMsgCount() {
+        return msgCounter;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // This class handles request messages received by this node.
@@ -439,6 +448,7 @@ public class RCMutualExclusionService {
                 Message msg = new Message(msgType, sourceNodeID, destNodeID, timeStamp);
                 // Messages are sent over SCTP using ByteBuffer
                 channel.send(msg.toByteBuffer(), messageInfo);
+                msgCounter++;
 
 
                 System.out.println(msg.message + " MSG SENT: " + msg.message + " to neighbor " + destNodeID);
