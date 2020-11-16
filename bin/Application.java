@@ -19,6 +19,7 @@
  */
 import java.io.*;
 import java.time.LocalTime; // Import the LocalTime class
+import java.time.Duration;  // Import the Duration class
 
 public class Application
 {
@@ -69,6 +70,9 @@ public class Application
 
             LocalTime initTime;
             LocalTime termTime;
+            LocalTime initResponseTime;
+            LocalTime termResponseTime;
+            long ResponseTime;
             File file = new File("/home/010/e/el/elw160030/AOS/project2/test/log.txt");
             // create the file if the file is not already present
             if(!file.exists()){
@@ -82,6 +86,11 @@ public class Application
             for(int reqNum = 1; reqNum <= configInfo.getNumRequestsPerNode(); reqNum++)
             {
                 System.out.println("Node " + node.nodeID + " requests to enter critical section " + reqNum + ".\n");
+                // Write request number to file
+                bw.write("Request #" + reqNum + ":");
+                bw.newLine();
+
+                initResponseTime = LocalTime.now();
                 // Request to enter critical section. Returns only when this process can enter its critical section.
                 rc.csEnter();
 
@@ -97,10 +106,13 @@ public class Application
                 // Exit critical section
                 System.out.println("Node " + nodeID + " exiting its critical section.");
                 termTime = LocalTime.now();
-               
-                // Write to file - writes to a file in local machine
-                bw.write("Request #" + reqNum + "; ");
+                termResponseTime = LocalTime.now();
+                ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
+                // Write response time to file
+                bw.write("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
                 bw.newLine();
+
+                // Write cs init and termination time to file
                 bw.write("Process ID: " + node.nodeID
                             + "; init(x): " + initTime
                             + "; term(x): " + termTime);
@@ -116,6 +128,8 @@ public class Application
                 // satisfied and when it generates the next request.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
             }
+            bw.write("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
+            bw.newLine();
 
             bw.close();
             
