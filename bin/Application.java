@@ -82,6 +82,12 @@ public class Application
             File file = new File(testfp);
             File file2 = new File(evalfp);
             
+            // create the directory if the dir is not already present
+            if (!file.getParentFile().exists())
+                file.getParentFile().mkdirs();
+            if (!file2.getParentFile().exists())
+                file2.getParentFile().mkdirs();
+
             // create the file if the file is not already present
             if(!file.exists()){
                 file.createNewFile();
