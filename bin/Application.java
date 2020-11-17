@@ -73,24 +73,41 @@ public class Application
             LocalTime initResponseTime;
             LocalTime termResponseTime;
             long ResponseTime;
-            File file = new File("/home/010/e/el/elw160030/AOS/project2/test/log.txt");
+            
+            // file names for testing and evaluation
+            String testfp = "/home/010/e/el/elw160030/AOS/project2/test/log";
+            String evalfp = "/home/010/e/el/elw160030/AOS/project2/test/eval";
+            String fname = "-" + configInfo.getNumOfNodes()
+                    + "-" + configInfo.getInterRequestDelay()
+                    + "-" + configInfo.getCsExecutionTime() + ".txt";
+            testfp += fname;
+            evalfp += fname;
+            File file = new File(testfp);
+            File file2 = new File(evalfp);
+            
             // create the file if the file is not already present
             if(!file.exists()){
                 file.createNewFile();
             }
-            //append the content to file
-            FileWriter fw = new FileWriter(file,true);
-            BufferedWriter bw = new BufferedWriter(fw);
+            if(!file2.exists()){
+                file2.createNewFile();
+            }
 
+            //append the content to log file
+            FileWriter fw = new FileWriter(file,true);
+            FileWriter fw2 = new FileWriter(file2,true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            BufferedWriter bw2 = new BufferedWriter(fw2);
+
+            bw2.write("Throughput init time: " + LocalTime.now());
+            bw2.newLine();
+            System.out.println("Throughput init time: " + LocalTime.now());
             // Iterate through each message request for the node.
             for(int reqNum = 1; reqNum <= configInfo.getNumRequestsPerNode(); reqNum++)
             {
-                System.out.println("Node " + node.nodeID + " requests to enter critical section " + reqNum + ".\n");
-                // Write request number to file
-                bw.write("Request #" + reqNum + ":");
-                bw.newLine();
-
                 initResponseTime = LocalTime.now();
+                
+                //System.out.println("Node " + node.nodeID + " requests to enter critical section " + reqNum + ".\n");
                 // Request to enter critical section. Returns only when this process can enter its critical section.
                 rc.csEnter();
 
@@ -109,9 +126,9 @@ public class Application
                 termResponseTime = LocalTime.now();
                 ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
                 // Write response time to file
-                bw.write("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
-                bw.newLine();
-
+                bw2.write("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
+                bw2.newLine();
+                System.out.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
                 // Write cs init and termination time to file
                 bw.write("Process ID: " + node.nodeID
                             + "; init(x): " + initTime
@@ -128,11 +145,15 @@ public class Application
                 // satisfied and when it generates the next request.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
             }
-            bw.write("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
-            bw.newLine();
-
+            bw2.write("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
+            bw2.newLine();
+            System.out.println("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
+            bw2.write("Throughput term time: " + LocalTime.now());
+            bw2.newLine();
+            System.out.println("Throughput term time: " + LocalTime.now());
             bw.close();
-            
+            bw2.close();
+
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
 
         }
