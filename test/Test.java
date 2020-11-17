@@ -79,10 +79,13 @@ class Test {
         }
         //System.out.println("log file populated.");
     }
+    
     public static void main(String[] args) throws Exception {
         try {
+            // Read and combine log files into one
             String logfile = "log.txt";
             combineLogs(args[0], logfile);
+            
             // Testing methology:
             // Read in the timestamps from the log file as well as the process ID for those timestamps
             // create a data structure  where each element of the data structure holds an enry form the log file
