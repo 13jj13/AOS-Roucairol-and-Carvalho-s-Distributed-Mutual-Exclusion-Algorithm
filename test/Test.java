@@ -14,21 +14,22 @@ class Test {
     */
     static boolean checkOverlap(ArrayList<ArrayList<String>> dataMatrix) {
         boolean check = false;
-        for(int row = 0; row < dataMatrix.size(); row++) {
+        for (int row = 0; row < dataMatrix.size(); row++) {
             ArrayList<String> currentRowData = dataMatrix.get(row);
-            
+	        System.out.println(currentRowData);
+
             // The init timestamp is greater than or equal to the term timestamp of the same process’s critical section.
-            if (currentRowData.get(1).compareTo(currentRowData.get(2)) > 0) {
+	        if(Long.parseLong(currentRowData.get(1)) > Long.parseLong(currentRowData.get(2))) {
                 check = true;
-                System.out.println("Overlap occured!");
+                System.out.println("Test 1 Overlap occurred!");
             }
-            
+
             // The init timestamp of this current process’s critical section is less than the term timestamp of the previous process’s critical section.
             if (row != 0) {
-                ArrayList<String> previousRowData = dataMatrix.get(row-1);
-                if (currentRowData.get(1).compareTo(previousRowData.get(1)) < 0) {
+                ArrayList<String> previousRowData = dataMatrix.get(row - 1);
+                if(Long.parseLong(currentRowData.get(1)) < Long.parseLong(previousRowData.get(2))) {
                     check = true;
-                    System.out.println("Overlap occured!");
+                    System.out.println("Test 2 Overlap occurred!");
                 }
             }
         }
