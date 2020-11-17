@@ -125,7 +125,7 @@ public class Application
 
                 // Exit critical section
                 System.out.println("Node " + nodeID + " exiting its critical section.");
-                
+                termTime = System.currentTimeMillis();
                 termResponseTime = LocalTime.now();
                 ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
                 
