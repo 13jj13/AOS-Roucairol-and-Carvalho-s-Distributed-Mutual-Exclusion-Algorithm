@@ -68,8 +68,8 @@ public class Application
             System.out.println("Mean CS-Execution Time: " + configInfo.getCsExecutionTime());
             System.out.println("Number of requests per node: " + configInfo.getNumRequestsPerNode());
 
-            LocalTime initTime;
-            LocalTime termTime;
+            long initTime;
+            long termTime;
             LocalTime initResponseTime;
             LocalTime termResponseTime;
             long ResponseTime;
@@ -111,10 +111,10 @@ public class Application
                 // Request to enter critical section. Returns only when this process can enter its critical section.
                 rc.csEnter();
 
+                initTime = System.currentTimeMillis();
                 // Once it returns, then process can enter its critical section.
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
-                initTime = LocalTime.now();
 
                 // Critical section -  CS Execution Time
                 // This is the time the node spends in its critical section.
@@ -122,8 +122,17 @@ public class Application
 
                 // Exit critical section
                 System.out.println("Node " + nodeID + " exiting its critical section.");
-                termTime = LocalTime.now();
+                
                 termResponseTime = LocalTime.now();
+                termTime = System.currentTimeMillis();
+                
+                // Inform mutual exclusion service that process has finished executing its critical section.
+                rc.csLeave();
+
+                // Inter request delay - time elapsed between when a node's current request is
+                // satisfied and when it generates the next request.
+                Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
+                
                 ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
                 // Write response time to file
                 bw2.write("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
@@ -137,13 +146,6 @@ public class Application
                 System.out.println("Process ID: " + node.nodeID
                                    + "; init(x): " + initTime
                                    + "; term(x): " + termTime);
-                
-                // Inform mutual exclusion service that process has finished executing its critical section.
-                rc.csLeave();
-
-                // Inter request delay - time elapsed between when a node's current request is
-                // satisfied and when it generates the next request.
-                Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
             }
             bw2.write("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
             bw2.newLine();
@@ -174,7 +176,7 @@ public class Application
     public static int getExpProbDistRandomVar(int mean)
     {
         // Assume probability is random value between 0 and 1
-        double prob = Math.random();
+        double prob = 1-Math.random();
         // Return random variable with exponential probability distribution.
         return (int) (-1 * mean * Math.log(prob) / Math.log(2));
     }
