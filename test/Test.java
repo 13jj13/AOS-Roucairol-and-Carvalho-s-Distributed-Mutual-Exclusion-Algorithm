@@ -39,7 +39,11 @@ class Test {
         try {
             // Read in the timestamps from the log file as well as the process ID for those timestamps
             // create a data structure  where each element of the data structure holds an enry form the log file 
-            File myObj = new File("./log.txt");
+            String logfile = "";
+            logfile = args[0];
+            //System.out.println(logfile);
+            
+            File myObj = new File(logfile);
             Scanner myReader = new Scanner(myObj);
             
             ArrayList<ArrayList<String>> dataMatrix = new ArrayList<ArrayList<String>>();
