@@ -67,37 +67,51 @@ class Evaluation {
 
     */
     static double getThroughput(Scanner myReader) {
-        ArrayList<ArrayList<String>> dataMatrix = new ArrayList<ArrayList<String>>();
+        String init = "";
+        String term = "";
+        String temp = "";
 
+        int initCounter = 0;
+        int termCounter = 0;
+        int counter = 0;
+        
         while (myReader.hasNextLine()) {
             String data = myReader.nextLine();
             // calc average throughput
-            if (data.indexOf("Process ID:") > -1) {
-                String[] tokens = data.split("; ");
-                // Create a temp ArrayList object of data
-                ArrayList<String> dataRow = new ArrayList<String>();
-                for (String t : tokens) {
-                    dataRow.add(t.substring(t.indexOf(":")+2));
+            if (data.indexOf("Throughput init time:") > -1) {
+                temp = data.substring(data.indexOf(":")+2);
+                initCounter++;
+                if (initCounter == 1) {
+                    init = temp;
+                } else {
+                    if (temp.compareTo(init) < 0) {
+                        init = temp;
+                    }
                 }
-                dataMatrix.add(dataRow);
+            }
+            if (data.indexOf("Throughput term time:") > -1) {
+                temp = data.substring(data.indexOf(":")+2);
+                termCounter++;
+                if (termCounter == 1) {
+                    term = temp;
+                } else {
+                    if (temp.compareTo(term) < 0) {
+                        term = temp;
+                    }
+                }
+            }
+            if (data.indexOf("PID #") > -1) {
+                counter ++;
             }
         }
 
-        // sort the entries from the log file by the init timestamp in ascending order
-        Collections.sort(dataMatrix, new Comparator<ArrayList<String>>() {
-            @Override
-            public int compare(ArrayList<String> o1, ArrayList<String> o2) {
-                return o1.get(1).compareTo(o2.get(1));
-            }
-        });
-
         // calculate throughput
-        double csnum = dataMatrix.size();
+        double csnum = counter;
         //System.out.println("# of Crtical Sections: " + csnum);
         
-        LocalTime initSecond = LocalTime.parse(dataMatrix.get(0).get(1));
+        LocalTime initSecond = LocalTime.parse(init);
         //System.out.println("init Second: " + initSecond);
-        LocalTime termSecond = LocalTime.parse(dataMatrix.get(dataMatrix.size()-1).get(2));
+        LocalTime termSecond = LocalTime.parse(term);
         //System.out.println("term Second: " + termSecond);
         double seconds = Duration.between(initSecond, termSecond).getSeconds();
         //System.out.println("time (seconds): " + seconds);
@@ -109,7 +123,11 @@ class Evaluation {
     public static void main(String[] args) throws Exception {
         try {
             // Read log file
-            File myObj = new File("./log.txt");
+            String logfile = "";
+            logfile = args[0];
+            //System.out.println(logfile);
+            
+            File myObj = new File(logfile);
             Scanner myReader;
         
             // get number of messages sent per number of requests
