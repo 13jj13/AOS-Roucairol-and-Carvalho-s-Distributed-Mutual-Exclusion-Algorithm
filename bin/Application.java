@@ -75,13 +75,10 @@ public class Application
             long ResponseTime;
             
             // file names for testing and evaluation
-            String testfp = "/home/010/e/el/elw160030/AOS/project2/test/log";
-            String evalfp = "/home/010/e/el/elw160030/AOS/project2/test/eval";
-            String fname = "-" + configInfo.getNumOfNodes()
-                    + "-" + configInfo.getInterRequestDelay()
-                    + "-" + configInfo.getCsExecutionTime() + ".txt";
-            testfp += fname;
-            evalfp += fname;
+            String dir = "/home/010/e/el/elw160030/AOS/project2/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
+            String testfp = dir + "/log-p" + node.nodeID + ".txt";
+            String evalfp = dir + "/eval-p" + node.nodeID + ".txt";
+            
             File file = new File(testfp);
             File file2 = new File(evalfp);
             
@@ -98,10 +95,15 @@ public class Application
             FileWriter fw2 = new FileWriter(file2,true);
             BufferedWriter bw = new BufferedWriter(fw);
             BufferedWriter bw2 = new BufferedWriter(fw2);
+            PrintWriter pw = new PrintWriter(bw);
+            PrintWriter pw2 = new PrintWriter(bw2);
+            
+            pw.println();
+            pw2.println();
 
-            bw2.write("Throughput init time: " + LocalTime.now());
-            bw2.newLine();
+            pw2.println("Throughput init time: " + LocalTime.now());
             System.out.println("Throughput init time: " + LocalTime.now());
+            
             // Iterate through each message request for the node.
             for(int reqNum = 1; reqNum <= configInfo.getNumRequestsPerNode(); reqNum++)
             {
@@ -110,8 +112,9 @@ public class Application
                 //System.out.println("Node " + node.nodeID + " requests to enter critical section " + reqNum + ".\n");
                 // Request to enter critical section. Returns only when this process can enter its critical section.
                 rc.csEnter();
-
+                
                 initTime = System.currentTimeMillis();
+
                 // Once it returns, then process can enter its critical section.
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
@@ -124,38 +127,41 @@ public class Application
                 System.out.println("Node " + nodeID + " exiting its critical section.");
                 
                 termResponseTime = LocalTime.now();
-                termTime = System.currentTimeMillis();
+                ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
                 
+                // Write response time to file
+                pw2.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
+                System.out.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
+                
+                // Write cs init and termination time to file
+                pw.println("Process ID: " + node.nodeID
+                            + "; init(x): " + initTime
+                            + "; term(x): " + termTime);
+                System.out.println("Process ID: " + node.nodeID
+                                   + "; init(x): " + initTime
+                                   + "; term(x): " + termTime);
+                                
                 // Inform mutual exclusion service that process has finished executing its critical section.
                 rc.csLeave();
 
                 // Inter request delay - time elapsed between when a node's current request is
                 // satisfied and when it generates the next request.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
-                
-                ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
-                // Write response time to file
-                bw2.write("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
-                bw2.newLine();
-                System.out.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
-                // Write cs init and termination time to file
-                bw.write("Process ID: " + node.nodeID
-                            + "; init(x): " + initTime
-                            + "; term(x): " + termTime);
-                bw.newLine();
-                System.out.println("Process ID: " + node.nodeID
-                                   + "; init(x): " + initTime
-                                   + "; term(x): " + termTime);
             }
-            bw2.write("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
-            bw2.newLine();
+            pw2.println("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
             System.out.println("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
-            bw2.write("Throughput term time: " + LocalTime.now());
-            bw2.newLine();
+            pw2.println("Throughput term time: " + LocalTime.now());
             System.out.println("Throughput term time: " + LocalTime.now());
+            
+            pw.println();
+            pw2.println();
             bw.close();
+            fw.close();
+            pw.close();
             bw2.close();
-
+            fw2.close();
+            pw2.close();
+            
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
 
         }
