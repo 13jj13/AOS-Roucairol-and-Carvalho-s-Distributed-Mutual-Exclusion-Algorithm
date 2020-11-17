@@ -173,15 +173,19 @@ public class RCMutualExclusionService {
         // Block from entering critical section until receives all keys.
         while(true)
         {
+            semaphore.acquire();
             // If received keys from all neighbors
             if(!keys.containsValue(false))
             {
                 // Node will enter critical section.
                 inCriticalSection = true;
+                semaphore.release();
 
                 // Return so node can execute its critical section.
                 return;
             }
+            semaphore.release();
+            Thread.sleep(100);
         }
     }
 
