@@ -72,7 +72,7 @@ public class Application
             LocalTime termResponseTime;
             long ResponseTime;
             
-            // file names for testing and evaluation
+            // file name for evaluation
             String dir = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
             String evalfp = dir + "/eval-p" + node.nodeID + ".txt";
             
@@ -93,9 +93,11 @@ public class Application
             PrintWriter pw2 = new PrintWriter(bw2);
             
             pw2.println();
-		
+	
+	    // Filename for test file 
 	    String test_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test.txt";
 	    File test = new File(test_path);
+	    // Used to determine if overlap occurred.
 	    boolean overlap = false;
 
             pw2.println("Throughput init time: " + LocalTime.now());
@@ -114,18 +116,23 @@ public class Application
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
 
+		// If test file already exists, then another process is currently executing its CS 
+		// so there is overlap
 		if(test.exists())
 		{
 			overlap = true;
+			// Delete file 
 			test.delete(); 
 		}
 		
+		// create test file as process enters critical section
 		test.createNewFile();
 
                 // Critical section -  CS Execution Time
                 // This is the time the node spends in its critical section.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getCsExecutionTime()));
 
+		// Delete test file as process leaves critical section
 		test.delete(); 
 
                 // Exit critical section
@@ -160,6 +167,7 @@ public class Application
             
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
 
+	     // Record test results of overlap
 	    String test_results_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test_results.txt";
 	    File test_results = new File(test_results_path);
 
@@ -175,9 +183,11 @@ public class Application
 	    String status = "";
 	    
 
+	    // If this process overlapped with any other process's CS, then print this message to test results file
 	    if(overlap){
 		status = "CRITICAL SECTIONS OVERLAP - FAIL";
 	    }
+	    // If this process did not overlap with any other process's CS, then print this message to test results file
 	    else {
 		status = "SUCCESS - CRITICAL SECTIONS DID NOT OVERLAP";
 	     }
