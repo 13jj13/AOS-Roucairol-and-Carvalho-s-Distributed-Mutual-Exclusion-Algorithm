@@ -68,44 +68,35 @@ public class Application
             System.out.println("Mean CS-Execution Time: " + configInfo.getCsExecutionTime());
             System.out.println("Number of requests per node: " + configInfo.getNumRequestsPerNode());
 
-            long initTime;
-            long termTime;
             LocalTime initResponseTime;
             LocalTime termResponseTime;
             long ResponseTime;
             
             // file names for testing and evaluation
-            String dir = "/home/010/e/el/elw160030/AOS/project2/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
-            String testfp = dir + "/log-p" + node.nodeID + ".txt";
+            String dir = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
             String evalfp = dir + "/eval-p" + node.nodeID + ".txt";
             
-            File file = new File(testfp);
             File file2 = new File(evalfp);
             
             // create the directory if the dir is not already present
-            if (!file.getParentFile().exists())
-                file.getParentFile().mkdirs();
             if (!file2.getParentFile().exists())
                 file2.getParentFile().mkdirs();
 
             // create the file if the file is not already present
-            if(!file.exists()){
-                file.createNewFile();
-            }
             if(!file2.exists()){
                 file2.createNewFile();
             }
 
             //append the content to log file
-            FileWriter fw = new FileWriter(file,true);
             FileWriter fw2 = new FileWriter(file2,true);
-            BufferedWriter bw = new BufferedWriter(fw);
             BufferedWriter bw2 = new BufferedWriter(fw2);
-            PrintWriter pw = new PrintWriter(bw);
             PrintWriter pw2 = new PrintWriter(bw2);
             
-            pw.println();
             pw2.println();
+		
+	    String test_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test.txt";
+	    File test = new File(test_path);
+	    boolean overlap = false;
 
             pw2.println("Throughput init time: " + LocalTime.now());
             System.out.println("Throughput init time: " + LocalTime.now());
@@ -118,34 +109,29 @@ public class Application
                 //System.out.println("Node " + node.nodeID + " requests to enter critical section " + reqNum + ".\n");
                 // Request to enter critical section. Returns only when this process can enter its critical section.
                 rc.csEnter();
-                
-                initTime = System.currentTimeMillis();
 
                 // Once it returns, then process can enter its critical section.
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
 
+		if(test.exists())
+		{
+			overlap = true;
+			test.delete(); 
+		}
+		
+		test.createNewFile();
+
                 // Critical section -  CS Execution Time
                 // This is the time the node spends in its critical section.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getCsExecutionTime()));
 
+		test.delete(); 
+
                 // Exit critical section
                 System.out.println("Node " + nodeID + " exiting its critical section.");
-                termTime = System.currentTimeMillis();
+                
                 termResponseTime = LocalTime.now();
-                ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
-                
-                // Write response time to file
-                pw2.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
-                System.out.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
-                
-                // Write cs init and termination time to file
-                pw.println("Process ID: " + node.nodeID
-                            + "; init(x): " + initTime
-                            + "; term(x): " + termTime);
-                System.out.println("Process ID: " + node.nodeID
-                                   + "; init(x): " + initTime
-                                   + "; term(x): " + termTime);
                                 
                 // Inform mutual exclusion service that process has finished executing its critical section.
                 rc.csLeave();
@@ -153,22 +139,53 @@ public class Application
                 // Inter request delay - time elapsed between when a node's current request is
                 // satisfied and when it generates the next request.
                 Thread.sleep(getExpProbDistRandomVar(configInfo.getInterRequestDelay()));
+
+		ResponseTime = Duration.between(initResponseTime, termResponseTime).toMillis();
+                
+                // Write response time to file
+                pw2.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
+                System.out.println("PID #" + node.nodeID + " response time (ms): " + ResponseTime);
+                
+
             }
             pw2.println("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
             System.out.println("PID #" + node.nodeID + " - total message count: " + rc.getMsgCount());
             pw2.println("Throughput term time: " + LocalTime.now());
             System.out.println("Throughput term time: " + LocalTime.now());
             
-            pw.println();
             pw2.println();
-            bw.close();
-            fw.close();
-            pw.close();
             bw2.close();
             fw2.close();
             pw2.close();
             
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
+
+	    String test_results_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test_results.txt";
+	    File test_results = new File(test_results_path);
+
+	    FileWriter fw_test = new FileWriter(test_results,true);
+            BufferedWriter bw_test = new BufferedWriter(fw_test);
+            PrintWriter pw_test = new PrintWriter(bw_test);
+
+	    if(!test_results.exists())
+	    {
+
+		test_results.createNewFile(); 
+	    }
+	    String status = "";
+	    
+
+	    if(overlap){
+		status = "CRITICAL SECTIONS OVERLAP - FAIL";
+	    }
+	    else {
+		status = "SUCCESS - CRITICAL SECTIONS DID NOT OVERLAP";
+	     }
+	    System.out.println(status); 
+	    pw_test.println(status);
+
+	    bw_test.close();
+	    pw_test.close();
 
         }
 
