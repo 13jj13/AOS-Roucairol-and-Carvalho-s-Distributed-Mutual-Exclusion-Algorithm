@@ -79,3 +79,11 @@ Listing 1: Example configuration file
 7 dc18 3467
 
 8 dc23 2546
+
+# Compiling code 
+javac ./bin/*.java
+
+# Run Algorithm
+cd launch
+./launch
+
