@@ -22,15 +22,15 @@ File stucture:
 	Project2\
 		bin\
 			Application.java
-      ConfigFileInfo.java
+      			ConfigFileInfo.java
 			Message.java
 			Node.java
-      NeighborNode.java
-      RCMutualExclusionService.java
+     			NeighborNode.java
+      			RCMutualExclusionService.java
 		launch\
 			cleanup.sh
 			config.txt
 			launcher.sh
-    test\
-      Test.java
-      Evaluation.java
+    		test\
+     			Test.java
+      			Evaluation.java
