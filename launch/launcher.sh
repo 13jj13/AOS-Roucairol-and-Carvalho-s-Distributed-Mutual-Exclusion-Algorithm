@@ -41,7 +41,7 @@ cat $CONFIGLOCAL | sed -e "s/#.*//" | sed -e "/^\s*$/d" | sed -e 's/\r$//g' |
         host=$( echo $line | awk '{ print $2 }' )
 		
 	# java -cp $BINDIR $PROG $p -> execute java.exe with custom classpath $BINDIR and execute program $PROG with argument nodeID $p and config file location $CONFIG
-	gnome-terminal -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $netid@$host "hostname; java -cp $BINDIR $PROG $p $CONFIG; exec bash" &
+	gnome-terminal -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $netid@$host "hostname; java -cp $BINDIR $PROG $p $PROJDIR; exec bash" &
 
         n=$(( n + 1 ))
     done
