@@ -41,8 +41,9 @@ public class Application
             // Otherwise, first commandline argument is nodeID.
             int nodeID = Integer.parseInt(args[0]);
 
-            // Second commandline argument is config file location.
-            String filename = args[1];
+            // Second commandline argument is project directory location.
+            String proj_dir = args[1];
+            String filename = proj_dir + "/launch/config.txt";
 
             // Retrieve config file information.
             ConfigFileInfo configInfo = new ConfigFileInfo(nodeID, filename);
@@ -73,7 +74,7 @@ public class Application
             long ResponseTime;
             
             // file name for evaluation
-            String dir = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
+            String dir = proj_dir + "/test/" + configInfo.getNumOfNodes() + "-" + configInfo.getInterRequestDelay() + "-" + configInfo.getCsExecutionTime();
             String evalfp = dir + "/eval-p" + node.nodeID + ".txt";
             
             File file2 = new File(evalfp);
@@ -93,11 +94,10 @@ public class Application
             PrintWriter pw2 = new PrintWriter(bw2);
             
             pw2.println();
-	
-	    // Filename for test file 
-	    String test_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test.txt";
+		
+	    // File used for testing for overlap
+	    String test_path = proj_dir + "/test/test.txt";
 	    File test = new File(test_path);
-	    // Used to determine if overlap occurred.
 	    boolean overlap = false;
 
             pw2.println("Throughput init time: " + LocalTime.now());
@@ -115,13 +115,12 @@ public class Application
                 // Once it returns, then process can enter its critical section.
                 System.out.println("Node " + nodeID + " entering its critical section.");
                 System.out.println("Request: " + reqNum);
-
 		// If test file already exists, then another process is currently executing its CS 
 		// so there is overlap
 		if(test.exists())
 		{
 			overlap = true;
-			// Delete file 
+			// Delete file
 			test.delete(); 
 		}
 		
@@ -167,8 +166,8 @@ public class Application
             
             System.out.println("Node " + nodeID + " executed all " + configInfo.getNumRequestsPerNode() + " critical sections.");
 
-	     // Record test results of overlap
-	    String test_results_path = "/home/012/j/jm/jmw150330/Documents/AOS/Projects/Project2/test/test_results.txt";
+	    // Record test results of overlap
+	    String test_results_path = proj_dir + "/test/test_results.txt";
 	    File test_results = new File(test_results_path);
 
 	    FileWriter fw_test = new FileWriter(test_results,true);
@@ -182,7 +181,6 @@ public class Application
 	    }
 	    String status = "";
 	    
-
 	    // If this process overlapped with any other process's CS, then print this message to test results file
 	    if(overlap){
 		status = "CRITICAL SECTIONS OVERLAP - FAIL";
