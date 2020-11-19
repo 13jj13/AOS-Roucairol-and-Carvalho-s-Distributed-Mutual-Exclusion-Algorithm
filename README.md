@@ -29,7 +29,10 @@ inspection of log files to verify the correctness of the execution will not be a
 graded on how accurate and automated your testing mechanism is.
 
 Our plans:
-The program will log the timestamps and process ID of each process that executes its critical section and the test will use these logs to check if there is any other process that also executed its critical section at the same time. This is done by checking if any process’s init-term timestamp pairs overlap with any other process’s init-term timestamp pairs.
+Each process creates a test.txt file when it enters its critical section. It deletes the file after it exits
+its critical section. Before creating the file, it checks if it already exists. If it does exist, then
+there is overlap between critical sections. Each process will print a fail or success message to
+results_test.txt. Test will read this file to determine if any processes overlapped critical sections. 
 
 **Experimental Evaluation:** Evaluate the performance of your implementation with respect to
 message complexity, response time and system throughput using experiments for various values
